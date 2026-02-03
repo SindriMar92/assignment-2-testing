@@ -12,12 +12,12 @@ import { DATE_UNIT_TYPES } from "../constants";
 
 describe("Date Utils", () => {
 	it("getCurrentYear return the current year", () => {
-		vi.useFakeTimers();
-		vi.setSystemTime(new Date("2022-01-01"));
+		const mockNow = new Date("2022-01-01T00:00:00.000Z").getTime();
+		vi.spyOn(Date, "now").mockReturnValue(mockNow);
 
 		expect(getCurrentYear()).toBe(2022);
 
-		vi.useRealTimers();
+		vi.restoreAllMocks();
 	});
 
 	it ("add adds days to a date", () => {
@@ -66,7 +66,7 @@ describe("Date Utils", () => {
 		expect(isSameDay(morning, evening)).toBe(true);
 	});
 
-	it("getHolidayd returns holidays for a year", async () => {
+	it("getHoliday returns holidays for a year", async () => {
 		vi.useFakeTimers();
 
 		const promise = getHolidays(2024);

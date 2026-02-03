@@ -1,8 +1,20 @@
-import moment from "moment";
+
+import {
+	getYear,
+	addSeconds,
+	addMinutes,
+	addDays,
+	addWeeks,
+	addMonths,
+	addYears,
+	isAfter,
+	isBefore,
+	isSameDay as isSameDayFns,
+} from "date-fns";
 import { DATE_UNIT_TYPES } from "./constants";
 
-export function getCurrentYear() {
-  return moment().year();
+export function getCurrentYear(): number {
+	return getYear(new Date(Date.now()));
 }
 
 export function add(
@@ -16,22 +28,40 @@ export function add(
   if (typeof amount !== 'number' || isNaN(amount)) {
     throw new Error('Invalid amount provided');
   }
-  return moment(date).add(amount, type as moment.unitOfTime.DurationConstructor).toDate();
+  
+  //return moment(date).add(amount, type as moment.unitOfTime.DurationConstructor).toDate();
+
+  switch (type) {
+	  case DATE_UNIT_TYPES.SECONDS:
+		  return addSeconds(date, amount);
+	  case DATE_UNIT_TYPES.MINUTES:
+		  return addMinutes(date, amount);
+	  case DATE_UNIT_TYPES.DAYS:
+		  return addDays(date, amount);
+	  case DATE_UNIT_TYPES.WEEKS:
+		  return addWeeks(date, amount);
+	  case DATE_UNIT_TYPES.MONTHS:
+		  return addMonths(date, amount);
+	  case DATE_UNIT_TYPES.YEARS:
+		  return addYears(date, amount);
+	  default:
+		  return addDays(date, amount);
+  }
 }
 
-export function isWithinRange(date: Date, from: Date, to: Date): boolean {
-  if (moment(from).isAfter(to)) {
-    throw new Error('Invalid range: from date must be before to date');
+export function isWithinRange(date: Date, from: Date, to: Date): boolean { 
+	if (isAfter(from, to)) {
+    		throw new Error('Invalid range: from date must be before to date');
   }
-  return moment(date).isBetween(from, to);
+  return isAfter(date, from) && isBefore(date, to);
 }
 
 export function isDateBefore(date: Date, compareDate: Date): boolean {
-  return moment(date).isBefore(compareDate);
+  return isBefore(date, compareDate);
 }
 
 export function isSameDay(date: Date, compareDate: Date): boolean {
-  return moment(date).isSame(compareDate, 'day');
+  return isSameDayFns(date, compareDate);
 }
 
 // Simulates fetching holidays from an API
